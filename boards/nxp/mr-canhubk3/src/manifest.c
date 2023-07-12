@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2021 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,29 +31,49 @@
  *
  ****************************************************************************/
 
-#pragma once
+/**
+ * @file manifest.c
+ *
+ * This module supplies the interface to the manifest of hardware that is
+ * optional and dependent on the HW REV and HW VER IDs
+ *
+ * The manifest allows the system to know whether a hardware option
+ * say for example the PX4IO is an no-pop option vs it is broken.
+ *
+ */
 
-#include "ActuatorEffectiveness.hpp"
-#include "ActuatorEffectivenessRotors.hpp"
-#include "ActuatorEffectivenessControlSurfaces.hpp"
+/****************************************************************************
+ * Included Files
+ ****************************************************************************/
 
-class ActuatorEffectivenessCustom : public ModuleParams, public ActuatorEffectiveness
+#include <px4_platform_common/px4_config.h>
+#include <stdbool.h>
+#include <syslog.h>
+
+#include "systemlib/px4_macros.h"
+#include "px4_log.h"
+
+/****************************************************************************
+ * Pre-Processor Definitions
+ ****************************************************************************/
+
+
+/************************************************************************************
+ * Name: board_query_manifest
+ *
+ * Description:
+ *   Optional returns manifest item.
+ *
+ * Input Parameters:
+ *   manifest_id - the ID for the manifest item to retrieve
+ *
+ * Returned Value:
+ *   0 - item is not in manifest => assume legacy operations
+ *   pointer to a manifest item
+ *
+ ************************************************************************************/
+
+__EXPORT px4_hw_mft_item board_query_manifest(px4_hw_mft_item_id_t id)
 {
-public:
-	ActuatorEffectivenessCustom(ModuleParams *parent);
-	virtual ~ActuatorEffectivenessCustom() = default;
-
-	bool getEffectivenessMatrix(Configuration &configuration, EffectivenessUpdateReason external_update) override;
-
-	void updateSetpoint(const matrix::Vector<float, NUM_AXES> &control_sp, int matrix_index,
-			    ActuatorVector &actuator_sp, const matrix::Vector<float, NUM_ACTUATORS> &actuator_min,
-			    const matrix::Vector<float, NUM_ACTUATORS> &actuator_max) override;
-
-	const char *name() const override { return "Custom"; }
-
-protected:
-	ActuatorEffectivenessRotors _motors;
-	ActuatorEffectivenessControlSurfaces _torque;
-
-	uint32_t _motors_mask{};
-};
+	return px4_hw_mft_unsupported;
+}
